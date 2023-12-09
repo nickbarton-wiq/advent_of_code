@@ -8,7 +8,6 @@ def get_data():
 
 def parse_seeds(data):
     seeds = [int(x) for x in data[0].split(':')[1].strip().split()]
-    print(len(seeds))
     output = []
     start = 0
     length = 2
@@ -16,8 +15,8 @@ def parse_seeds(data):
         start = seeds.pop(0)
         length = seeds.pop(0)
         generated = [x for x in range(start, start + length)]
-        if generated is not None:
-            output.extend(generated)
+        output.extend(generated)
+    print(output)
     return output
 
 
@@ -86,44 +85,46 @@ def get_max(all_mappings):
 
 
 def part1(data):
-    seeds = parse_seeds(data)
+    # seeds = parse_seeds(data, seeds_to_soil)
     seeds_to_soil = parse_map_type(data, 'seed-to-soil')
-    soil_to_fertilizer = parse_map_type(data, 'soil-to-fertilizer')
-    fertilizer_to_water = parse_map_type(data, 'fertilizer-to-water')
-    water_to_light = parse_map_type(data, 'water-to-light')
-    light_to_temperature = parse_map_type(data, 'light-to-temperature')
-    temperature_to_humidity = parse_map_type(data, 'temperature-to-humidity')
-    humidity_to_location = parse_map_type(data, 'humidity-to-location')
+    print(seeds_to_soil)
+    # soil_to_fertilizer = parse_map_type(data, 'soil-to-fertilizer')
+    # fertilizer_to_water = parse_map_type(data, 'fertilizer-to-water')
+    # water_to_light = parse_map_type(data, 'water-to-light')
+    # light_to_temperature = parse_map_type(data, 'light-to-temperature')
+    # temperature_to_humidity = parse_map_type(data, 'temperature-to-humidity')
+    # humidity_to_location = parse_map_type(data, 'humidity-to-location')
 
-    all_mappings = [seeds_to_soil, soil_to_fertilizer, fertilizer_to_water, water_to_light, light_to_temperature,
-                    temperature_to_humidity, humidity_to_location]
+    # all_mappings = [seeds_to_soil, soil_to_fertilizer, fertilizer_to_water, water_to_light, light_to_temperature,
+    #                 temperature_to_humidity, humidity_to_location]
 
-    max_number = get_max(all_mappings)
-    min_seed = min(seeds)
-    print(min_seed, max_number)
+    # max_number = get_max(all_mappings)
+    # min_seed = min(seeds)
+    # print(min_seed, max_number)
 
-    df = pl.DataFrame({'seeds': seeds})
+    # df = pl.DataFrame({'seeds': seeds})
     # print(df)
     df = create_mapping('seeds', 'soil', df, seeds_to_soil)
     # print(df)
-    df = create_mapping('soil', 'fertilizer', df, soil_to_fertilizer)
-    # print(df)
-    df = create_mapping('fertilizer', 'water', df, fertilizer_to_water)
-    # print(df)
-    df = create_mapping('water', 'light', df, water_to_light)
-    # print(df)
-    df = create_mapping('light', 'temperature', df, light_to_temperature)
-    # print(df)
-    df = create_mapping('temperature', 'humidity', df, temperature_to_humidity)
-    # print(df)
-    df = create_mapping('humidity', 'location', df, humidity_to_location)
-    # print(df)
+    # df = create_mapping('soil', 'fertilizer', df, soil_to_fertilizer)
+    # # print(df)
+    # df = create_mapping('fertilizer', 'water', df, fertilizer_to_water)
+    # # print(df)
+    # df = create_mapping('water', 'light', df, water_to_light)
+    # # print(df)
+    # df = create_mapping('light', 'temperature', df, light_to_temperature)
+    # # print(df)
+    # df = create_mapping('temperature', 'humidity', df, temperature_to_humidity)
+    # # print(df)
+    # df = create_mapping('humidity', 'location', df, humidity_to_location)
+    # # print(df)
 
-    print(df.with_columns("location").min())
+    # print(df.with_columns("location").min())
 
 
 if __name__ == '__main__':
     data = get_data()
+    # parse_seeds(data)
     part1(data)
 
     # seeds = parse_seeds(data)
