@@ -150,28 +150,29 @@ def rank_hands(hands):
     return sorted_hands
 
 
+def rank_and_score(hand_rank_list):
+    ranked_cards = []
+    for hand_rank in hand_rank_list:
+
+        if len(hand_rank) == 0:
+            continue
+        elif len(hand_rank) > 0:
+            hand_list = list(hand_rank.values())[0]
+            if len(hand_list) == 1:
+                ranked_cards.append(list(hand_list)[0].bid)
+            elif len(hand_list) > 1:
+                sorted_hands = rank_hands(hand_list)
+                for hand in sorted_hands:
+                    ranked_cards.append(hand.bid)
+
+    score = sum([x * i for i, x in enumerate(ranked_cards, start=1)])
+    return score
+
+
 if __name__ == '__main__':
     data = get_data()
     parsed_data = parse_data(data)
     hands = create_hands(parsed_data)
     hand_rank_list = rank_hands_by_type(hands)
-
-    print(hand_rank_list)
-    ranked_cards = []
-    for hand_rank in hand_rank_list:
-
-        if len(hand_rank) == 0:
-            print("len 0, continuing")
-            continue
-        elif len(hand_rank) > 0:
-            hand_list = list(hand_rank.values())[0]
-            if len(hand_list) == 1:
-                print(f"len 1, appending: {hand_list=}")
-                ranked_cards.append(list(hand_list)[0].bid)
-            elif len(hand_list) > 1:
-                print(f"len > 1, sorting: {hand_list=}")
-                sorted_hands = rank_hands(hand_list)
-                for hand in sorted_hands:
-                    ranked_cards.append(hand.bid)
-
-    print(sum([x * i for i, x in enumerate(ranked_cards, start=1)]))
+    score = rank_and_score(hand_rank_list)
+    print(score)
