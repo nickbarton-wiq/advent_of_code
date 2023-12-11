@@ -161,19 +161,19 @@ def rank_hands_by_type_and_strength(hand_rank_list: List[Dict[str, Hand]]) -> Li
             hand_list = next(iter(hand_rank.values()))
             sorted_hands = rank_hands_by_strength(hand_list)
             for hand in sorted_hands:
-                ranked_hands.append(hand.bid)
+                ranked_hands.append(hand)
     return ranked_hands
 
 
 def rank_hands_by_strength(hands: List[Hand]) -> List[Hand]:
     """Sort hands of the same type based on their strength"""
-    sorted_hands = sorted(hands, key=lambda x: x.hand_strength())
-    return sorted_hands
+    return sorted(hands, key=lambda x: x.hand_strength())
 
 
 def score_hands(hands: List[Hand]) -> int:
     """Calculates the score of a hand"""
-    score = sum([x * i for i, x in enumerate(hands, start=1)])
+    hands_score = [x.bid * i for i, x in enumerate(hands, start=1)]
+    score = sum(hands_score)
     return score
 
 
