@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 
 def get_data():
@@ -22,7 +22,8 @@ class Hand():
         self.bid = int(bid)
 
     @property
-    def cards(self):
+    def cards(self) -> Dict[str, int]:
+        """Returns a dictionary with the cards in the hand as keys and the number of re-occurring cards as values"""
         cards = {}
         for card in self.hand:
             if card not in cards:
@@ -32,7 +33,8 @@ class Hand():
         return dict(sorted(cards.items(), key=lambda item: item[1]))
 
     @property
-    def type(self):
+    def type(self) -> str:
+        """Returns the type of the hand as a string"""
         if self.five_of_a_kind():
             return 'Five of a kind'
         elif self.four_of_a_kind():
@@ -50,7 +52,8 @@ class Hand():
         else:
             return 'Something went wrong'
 
-    def type_rank(self):
+    def type_rank(self) -> int:
+        """Returns the type of the hand as a number"""
         if self.five_of_a_kind():
             return 7
         elif self.four_of_a_kind():
@@ -68,68 +71,75 @@ class Hand():
         else:
             return 0
 
-    def five_of_a_kind(self):
+    def five_of_a_kind(self) -> bool:
+        """Checks if the hand is a five of a kind"""
         if len(self.cards) == 1:
             if self.get_first_card_count(0) == 5:
                 return True
         return False
 
-    def four_of_a_kind(self):
+    def four_of_a_kind(self) -> bool:
+        """Checks if the hand is a four of a kind"""
         if len(self.cards) == 2 and self.get_last_card_count() == 4:
             return True
         return False
 
-    def full_house(self):
+    def full_house(self) -> bool:
+        """Checks if the hand is a full house"""
         if len(self.cards) == 2 and self.get_last_card_count() == 3 and self.get_first_card_count(0) == 2:
             return True
         return False
 
-    def three_of_a_kind(self):
+    def three_of_a_kind(self) -> bool:
+        """Checks if the hand is a three of a kind"""
         if len(self.cards) == 3 and self.get_last_card_count() == 3:
             return True
         return False
 
-    def two_pair(self):
+    def two_pair(self) -> bool:
+        """Checks if the hand is a two pair"""
         if len(self.cards) == 3 and self.get_last_card_count() == 2 and self.get_first_card_count(0) == 1:
             return True
         return False
 
-    def one_pair(self):
+    def one_pair(self) -> bool:
+        """Checks if the hand is a one pair"""
         if len(self.cards) == 4 and self.get_last_card_count() == 2:
             return True
         return False
 
-    def high_card(self):
+    def high_card(self) -> bool:
+        """Checks if the hand is a high card"""
         if len(self.cards) == 5:
             return True
         return False
 
-    def get_last_card_count(self):
+    def get_last_card_count(self) -> int:
+        """Gets the count of the least occuring card in the hand"""
         return list(self.cards.items())[-1][1]
 
-    def get_first_card_count(self, n):
+    def get_first_card_count(self, n) -> int:
+        """Gets the count of the most ocurring in the hand"""
         return list(self.cards.items())[n][1]
 
-    def get_nth_card(self, n):
+    def get_nth_card(self, n) -> str:
+        """Gets the nth card in the hand, ordered as received from the dealer"""
         return self.hand[n]
 
-    def hand_strength(self):
-        """
-        Converts a hand into a tuple representing its strength.
-
-        :param hand: A string representing a poker hand.
-        :return: A tuple of integers representing the hand's strength.
-        """
+    def hand_strength(self) -> tuple:
+        """Converts a hand into a tuple representing its strength. The tuple is used to compare hands"""
         card_order = {"A": 13, "K": 12, "Q": 11, "J": 10, "T": 9, "9": 8, "8": 7, "7": 6, "6": 5, "5": 4, "4": 3,
                       "3": 2, "2": 1}
         return tuple(card_order[card] for card in self.hand)
 
 
 def create_hands(data) -> List[Hand]:
+    """Creates a list of Hand objects from the data"""
     return [Hand(hand[0], hand[1]) for hand in data]
 
 
-def rank_hands_by_type(hands):
+def rank_hands_by_type(hands: List[Hand]) -> List[Dict[str, Hand]]:
+    """Ranks hands by type, returns a list of dictionaries with the hand type as key and the hand as value"""
     hand_rank_list = []
     for i in range(1, 8):
         hand_rank = {}
@@ -143,29 +153,27 @@ def rank_hands_by_type(hands):
     return hand_rank_list
 
 
-def rank_hands(hands):
-    # Sort the hands based on their strength
+def rank_hands_by_type_and_strength(hand_rank_list: List[Dict[str, Hand]]) -> List[Hand]:
+    """Ranks all hands by type and then by strength, then calculate and return the score"""
+    ranked_hands = []
+    for hand_rank in hand_rank_list:
+        if len(hand_rank) > 0:
+            hand_list = next(iter(hand_rank.values()))
+            sorted_hands = rank_hands_by_strength(hand_list)
+            for hand in sorted_hands:
+                ranked_hands.append(hand.bid)
+    return ranked_hands
 
+
+def rank_hands_by_strength(hands: List[Hand]) -> List[Hand]:
+    """Sort hands of the same type based on their strength"""
     sorted_hands = sorted(hands, key=lambda x: x.hand_strength())
     return sorted_hands
 
 
-def rank_and_score(hand_rank_list):
-    ranked_cards = []
-    for hand_rank in hand_rank_list:
-
-        if len(hand_rank) == 0:
-            continue
-        elif len(hand_rank) > 0:
-            hand_list = list(hand_rank.values())[0]
-            if len(hand_list) == 1:
-                ranked_cards.append(list(hand_list)[0].bid)
-            elif len(hand_list) > 1:
-                sorted_hands = rank_hands(hand_list)
-                for hand in sorted_hands:
-                    ranked_cards.append(hand.bid)
-
-    score = sum([x * i for i, x in enumerate(ranked_cards, start=1)])
+def score_hands(hands: List[Hand]) -> int:
+    """Calculates the score of a hand"""
+    score = sum([x * i for i, x in enumerate(hands, start=1)])
     return score
 
 
@@ -173,6 +181,7 @@ if __name__ == '__main__':
     data = get_data()
     parsed_data = parse_data(data)
     hands = create_hands(parsed_data)
-    hand_rank_list = rank_hands_by_type(hands)
-    score = rank_and_score(hand_rank_list)
+    hands = rank_hands_by_type(hands)
+    hands = rank_hands_by_type_and_strength(hands)
+    score = score_hands(hands)
     print(score)
