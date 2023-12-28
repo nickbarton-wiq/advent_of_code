@@ -27,54 +27,43 @@ class Galaxy:
 class GalaxyMap:
     def __init__(self, file: str):
         self.file = file
-        self.map = self.get_map()
-        self.blank_rows = self._get_blank_rows()
-        self.blank_columns = self._get_blank_columns()
-
-        self.expansion_rate = 999999
+        self.get_map()
 
     def get_map(self):
-        map: List = []
+        self.map: List = []
         with open(self.file) as f:
-            map_rows = f.read().splitlines()
-            for row in map_rows:
-                map.append([x for x in row])
-        return map
+            map = f.read().splitlines()
+            for row in map:
+                self.map.append([x for x in row])
 
     def expand_galaxy(self):
         self._expand_rows()
         self._expand_columns()
 
-    def _get_blank_rows(self):
-        blank_rows = []
+    def _expand_rows(self):
+        rows_to_insert = []
         for i, row in enumerate(self.map):
             if set(row) == {'.'}:
-                blank_rows.append(i)
-        return blank_rows
+                rows_to_insert.append(i)
 
-    def _get_blank_columns(self):
-        blank_columns = []
-        for i in range(len(self.map[0])):
-            if set([row[i] for row in self.map]) == {'.'}:
-                blank_columns.append(i)
-        return blank_columns
-
-    def _expand_rows(self):
-        while len(self.blank_rows) > 0:
-            row_to_expand = self.blank_rows.pop()
-            for galaxy in self.galaxies.values():
-                if galaxy.x >= row_to_expand:
-                    galaxy.x += self.expansion_rate
+        while len(rows_to_insert) > 0:
+            row = rows_to_insert.pop()
+            self.map.insert(row, ['.' for _ in self.map[0]])
 
     def _expand_columns(self):
-        while len(self.blank_columns) > 0:
-            column_to_expand = self.blank_columns.pop()
-            for galaxy in self.galaxies.values():
-                if galaxy.y >= column_to_expand:
-                    galaxy.y += self.expansion_rate
+        columns_to_insert = []
+        for i in range(len(self.map[0])):
+            if set([row[i] for row in self.map]) == {'.'}:
+                columns_to_insert.append(i)
+
+        while len(columns_to_insert) > 0:
+            column = columns_to_insert.pop()
+            for i, row in enumerate(self.map):
+                row.insert(column, '.')
+                self.map[i] = row
 
     def find_galaxies(self):
-        galaxy_id = 1
+        galaxy_id = 0
         self.galaxies = {}
         for x, row in enumerate(self.map):
             for y, column in enumerate(row):
@@ -91,33 +80,25 @@ class GalaxyMap:
                     self.galaxy_combinations.add(tuple(sorted([galaxy_1, galaxy_2])))
 
     def calculate_distance(self, galaxy_1: Galaxy, galaxy_2: Galaxy):
+        # abs(x1 - x2) + abs(y1 - y2)
         return abs(galaxy_1.x - galaxy_2.x) + abs(galaxy_1.y - galaxy_2.y)
 
-    def calculate_distances(self):
-        self.distances = {}
+    def find_distances(self):
+        distances = {}
         for combination in self.galaxy_combinations:
             galaxy_1, galaxy_2 = combination
-            self.distances[combination] = self.calculate_distance(galaxy_1, galaxy_2)
+            distances[combination] = self.calculate_distance(galaxy_1, galaxy_2)
 
-    def calculate_total_distance(self):
-        distances = [self.distances[combination] for combination in self.galaxy_combinations]
+        distances = [distances[combination] for combination in self.galaxy_combinations]
         return sum(distances)
-
-    def find_distance(self, galaxy_1: int, galaxy_2: int):
-        galaxy_1 = self.galaxies[galaxy_1]
-        galaxy_2 = self.galaxies[galaxy_2]
-        return self.distances[tuple(sorted([galaxy_1, galaxy_2]))]
 
 
 def main():
-    galaxy_map = GalaxyMap('2023/day_11.input')
-    galaxy_map.find_galaxies()
+    galaxy_map = GalaxyMap('2023/11/input.txt')
     galaxy_map.expand_galaxy()
+    galaxy_map.find_galaxies()
     galaxy_map.find_galaxy_combinations()
-    galaxy_map.calculate_distances()
-
-    # galaxy_map.find_distance(1, 7)
-    return galaxy_map.calculate_total_distance()
+    return galaxy_map.find_distances()
 
 
 if __name__ == '__main__':

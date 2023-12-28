@@ -94,7 +94,7 @@ def find_starting_position(positions):
 
 
 def main():
-    data = get_data('2023/day_10.input')
+    data = get_data('2023/10/input.txt')
     positions = create_positions(data)
     pipe = [find_starting_position(positions)]
 
