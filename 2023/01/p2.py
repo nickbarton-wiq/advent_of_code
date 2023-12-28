@@ -2,22 +2,11 @@ import re
 
 
 def get_data():
-    with open('day_01.input') as f:
+    with open('2023/01/input.txt') as f:
         return f.read().splitlines()
 
 
-def part1(data):
-    output = []
-    for line in data:
-        code = ""
-        numbers = re.findall(r'-?\d', line)
-        code += numbers[0]
-        code += numbers[-1]
-        output.append(int(code))
-    return sum(output)
-
-
-def part2(data):
+def main(data):
     mapping = {
         'one': '1',
         'two': '2',
@@ -50,5 +39,4 @@ def part2(data):
 
 if __name__ == '__main__':
     data = get_data()
-    # print(part1(data))
-    print(part2(data))
+    print(main(data))
