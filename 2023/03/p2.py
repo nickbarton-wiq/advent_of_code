@@ -2,7 +2,7 @@ import re
 
 
 def get_data():
-    with open('day_03.input') as f:
+    with open('2023/03/input.txt') as f:
         return f.read().splitlines()
 
 
@@ -85,21 +85,6 @@ class PartNumber:
     @property
     def has_adjacent_values(self):
         return len(self.adjacent_values) >= 1
-
-
-def part1(data):
-    output = 0
-    part_numbers = []
-    for line_number, line_data in enumerate(data):
-        for match in re.finditer(r'\d+', line_data):
-            part_numbers.extend([PartNumber(match.group(), line_number, match.start(), data)])
-
-    for part_number in part_numbers:
-        if part_number.has_adjacent_values:
-            output += int(part_number.part_number)
-    return output
-
-# ***** PART 2 *****
 
 
 class Gear:
@@ -264,7 +249,7 @@ class Gear:
         return output
 
 
-def part2(data):
+def main(data):
     gear_ratio_sum = 0
     gears = []
     for line_number, line_data in enumerate(data):
@@ -284,5 +269,4 @@ def part2(data):
 
 if __name__ == '__main__':
     data = get_data()
-    # print(part1(data))
-    part2(data)
+    main(data)
